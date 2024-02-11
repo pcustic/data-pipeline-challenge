@@ -11,9 +11,13 @@ from pymongo import MongoClient
 from app import settings
 
 from app.models import Product, UploadedFile
+from app.schemas import (
+    UploadedFileResponse,
+    UploadedFileMessage,
+    UploadedFileStatus,
+    MultipleProducts,
+)
 from app.mq import MessagePublisher
-
-from app.schemas import UploadedFileResponse, UploadedFileMessage, UploadedFileStatus
 
 
 async def init_db():
@@ -52,8 +56,12 @@ app = FastAPI(
 app.mq: MessagePublisher
 
 
-@app.post("/upload", response_model=UploadedFileResponse, tags=["upload"])
+@app.post("/upload", response_model=UploadedFileResponse, tags=["Upload"])
 async def upload_dataset_file(file: UploadFile, request: Request):
+    """
+    Upload json file with the list of products to ingest into Veryfi database.
+    """
+
     current_time = datetime.now()
     current_timestamp = str(int(current_time.timestamp()))
 
@@ -95,8 +103,12 @@ async def upload_dataset_file(file: UploadFile, request: Request):
     }
 
 
-@app.get("/upload/status/{file_id}", response_model=UploadedFileStatus, tags=["upload"])
+@app.get("/upload/status/{file_id}", response_model=UploadedFileStatus, tags=["Upload"])
 async def file_status(file_id: str):
+    """
+    Check the status of an uploaded file.
+    """
+
     uploaded_file = UploadedFile.get(file_id).run()
 
     if not uploaded_file:
@@ -113,3 +125,60 @@ async def file_status(file_id: str):
         "records_processed": uploaded_file.records_processed,
         "records_failed": uploaded_file.records_failed,
     }
+
+
+@app.get("/product/find/code/{code}", response_model=Product, tags=["Find Products"])
+async def find_product_by_code(code: str):
+    """
+    Find single product by code.
+    """
+
+    product = Product.find_one(Product.code == code).run()
+
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="There is no product with this code.",
+        )
+
+    return product
+
+
+@app.get(
+    "/product/find/name/partial/{product_name}",
+    response_model=MultipleProducts,
+    tags=["Find Products"],
+)
+async def find_products_partial(product_name: str):
+    """
+    Find top 20 products that contain product_name in the product_name field.
+    """
+
+    regex_pattern = f".*{product_name}.*"
+
+    products = (
+        Product.find({"product_name": {"$regex": regex_pattern, "$options": "i"}})
+        .limit(20)
+        .to_list()
+    )
+
+    response = {"search_term": product_name, "products": products}
+
+    return response
+
+
+@app.get(
+    "/product/find/name/exact/{product_name}",
+    response_model=MultipleProducts,
+    tags=["Find Products"],
+)
+async def find_products_exact(product_name: str):
+    """
+    Find products that exactly match the product name. Show at most 20 results.
+    """
+
+    products = Product.find(Product.product_name == product_name)
+
+    response = {"search_term": product_name, "products": products}
+
+    return response

@@ -1,6 +1,7 @@
 from pydantic import BaseModel
-
 from datetime import datetime
+
+from .models import Product
 
 
 class UploadedFileResponse(BaseModel):
@@ -45,3 +46,7 @@ class RecordsBatchForProcessing(BaseModel):
 
     file_id: str
     records: list[dict]
+
+
+class MultipleProducts(BaseModel):
+    products: list[Product]

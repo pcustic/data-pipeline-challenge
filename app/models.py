@@ -17,6 +17,7 @@ class Product(Document):
 
     class Settings:
         name = "products"
+        indexes = ["product_name"]
 
     @before_event(Insert, Replace)
     def update_last_modified(self):
