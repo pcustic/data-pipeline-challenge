@@ -117,6 +117,8 @@ Now, you only need to run one command:
 ```shell
 docker-compose up -d
 ```
+(Before running make sure you don't have some services already listening on ports `80`, `15672`, `5672` and `27017`)
+
 
 It will build all the necessary docker images and will run the containers. 
 
