@@ -1,10 +1,8 @@
-import asyncio
 import logging
 import pika
 
 from pika.adapters.asyncio_connection import AsyncioConnection
 
-# TODO: think about logging
 
 logging.basicConfig(
     level=logging.WARNING,
@@ -33,8 +31,6 @@ class MessagePublisher:
         )
 
     def connect(self):
-        logger.info("Connecting to %s", self._url)
-
         return AsyncioConnection(
             pika.URLParameters(self._url),
             on_open_callback=self.on_connection_open,
@@ -66,8 +62,6 @@ class MessagePublisher:
     def publish_message(self, message, exchange, routing_key):
         if self._channel is None or not self._channel.is_open:
             raise RabbitMQException("Channel closed.")
-
-        # TODO: maybe try except?
 
         self._channel.basic_publish(
             exchange,
@@ -187,8 +181,6 @@ class MessageConsumer:
         try:
             self._consume_message(body, basic_deliver, properties)
         except Exception as e:
-            print(e)
-            # TODO: add comment on how to handle errors and redeliver -> put in logging and alerting
             self.re_publish_message(basic_deliver.delivery_tag)
             return
 

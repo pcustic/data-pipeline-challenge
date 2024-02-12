@@ -1,4 +1,3 @@
-import time
 import logging
 
 from datetime import datetime
@@ -48,10 +47,6 @@ class DataProcessor:
         insert otherwise).
 
         """
-
-        start = time.time()
-        # TODO: remove time
-
         records_batch = RecordsBatchForProcessing.model_validate_json(message_body)
 
         records_processed = 0
@@ -82,8 +77,6 @@ class DataProcessor:
         self.update_uploaded_file_records_number_data(
             records_batch.file_id, records_processed, records_failed
         )
-
-        print("TIME: ", time.time() - start)
 
     def prepeare_record(self, record, records_batch):
         # We need to remove the external ids if they exist and add our file_id and last_modified_at_veryfi.

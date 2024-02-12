@@ -4,8 +4,6 @@ from dotenv import load_dotenv
 # load environment variables from .env
 load_dotenv()
 
-# TODO: https://fastapi.tiangolo.com/advanced/settings/
-
 
 MONGODB_CONNECTION_URL = os.getenv(
     "MONGODB_CONNECTION_URL", "mongodb://localhost:27017/veryfi"

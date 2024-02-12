@@ -1,5 +1,4 @@
 import ijson
-import time
 import logging
 
 from pathlib import Path
@@ -59,9 +58,6 @@ class FileSplitter:
         If everything went well it deletes the uploaded file.
 
         """
-
-        # TODO: remove time.time and print()
-        start = time.time()
         uploaded_file_message = UploadedFileMessage.model_validate_json(message_body)
 
         file_should_be_deleted = True
@@ -98,8 +94,6 @@ class FileSplitter:
 
         if file_should_be_deleted:
             self.delete_file(uploaded_file_message.location)
-
-        print("TIME: ", time.time() - start)
 
     def update_file_status(self, uploaded_file_id, status, raise_exc=True):
         uploaded_file = UploadedFile.get(uploaded_file_id).run()
