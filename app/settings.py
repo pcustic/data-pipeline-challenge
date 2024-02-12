@@ -16,5 +16,5 @@ RABBITMQ_PORT = int(os.getenv("RABBITMQ_PORT", 5672))
 
 FILES_DIRECTORY = os.getenv(
     "FILES_DIRECTORY",
-    "/Users/porin/work/my_projects/data-pipeline-challenge/files_uploaded",
+    "/data/uploaded_files",
 )
