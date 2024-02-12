@@ -38,14 +38,12 @@ class FileSplitter:
         )
 
         self.publisher = MessagePublisher(amqp_url, "file_splitter")
+        self.publisher.connect()
 
         client = MongoClient(settings.MONGODB_CONNECTION_URL)
         init_bunnet(database=client["veryfi"], document_models=[UploadedFile])
 
         self.logger = logging.getLogger("file_splitter")
-
-    def connect_publisher(self):
-        self.publisher.connect()
 
     def message_consumer(self, body, basic_deliver, properties):
         self.split_uploaded_files_and_send_records_to_processing(body)
@@ -161,7 +159,6 @@ class FileSplitter:
             self.logger.warning(f"File {file_location} already deleted.")
 
     def run(self):
-        self.connect_publisher()
         self.consumer.run()
 
 
