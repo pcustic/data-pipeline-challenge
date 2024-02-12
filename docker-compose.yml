@@ -15,7 +15,7 @@ services:
       veryfi_mongo:
         condition: service_started
 
-  veryf_file_splitter:
+  veryfi_file_splitter:
     build:
       context: .
       dockerfile: ./docker/file_splitter.Dockerfile
@@ -27,7 +27,7 @@ services:
       veryfi_mongo:
         condition: service_started
 
-  veryf_data_processor:
+  veryfi_data_processor:
     build:
       context: .
       dockerfile: ./docker/data_processor.Dockerfile
