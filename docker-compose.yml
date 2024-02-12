@@ -1,0 +1,64 @@
+version: "3"
+
+services:
+  veryfi_api:
+    build:
+      context: .
+      dockerfile: ./docker/api.Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - uploaded_files:/data/uploaded_files
+    depends_on:
+      veryfi_rabbit:
+        condition: service_healthy
+      veryfi_mongo:
+        condition: service_started
+
+  veryf_file_splitter:
+    build:
+      context: .
+      dockerfile: ./docker/file_splitter.Dockerfile
+    volumes:
+      - uploaded_files:/data/uploaded_files
+    depends_on:
+      veryfi_rabbit:
+        condition: service_healthy
+      veryfi_mongo:
+        condition: service_started
+
+  veryf_data_processor:
+    build:
+      context: .
+      dockerfile: ./docker/data_processor.Dockerfile
+    volumes:
+      - uploaded_files:/data/uploaded_files
+    depends_on:
+      veryfi_rabbit:
+        condition: service_healthy
+      veryfi_mongo:
+        condition: service_started
+
+  veryfi_rabbit:
+    build:
+      context: .
+      dockerfile: ./docker/rabbitmq.Dockerfile
+    environment:
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbitmq_management load_definitions "/tmp/definitions.json"
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+  veryfi_mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+
+volumes:
+  uploaded_files:
+

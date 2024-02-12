@@ -25,7 +25,7 @@ class Product(Document):
 
 
 class UploadedFileStatus(str, Enum):
-    uploaded = "uploaded"
+    uploaded = "uploaded - waiting for processing"
     processing = "processing"
     failed = "failed"
     processed = "processed"
