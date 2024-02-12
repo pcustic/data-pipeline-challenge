@@ -9,7 +9,7 @@ class Product(Document):
     product_name: str | None = None
 
     last_modified_at_veryfi: datetime | None = None
-    # file_id is here we know from which file it was imported.
+
     file_id: str
 
     class Config:
