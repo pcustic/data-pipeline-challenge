@@ -11,7 +11,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Reduce the log level of pika client to WARNING, so we don't overfill the logs
+# Reduce the log level of pika client to WARNING, so we don't overfill the logs.
 logging.getLogger("pika").setLevel(logging.WARNING)
 
 
@@ -20,6 +20,8 @@ class RabbitMQException(Exception):
 
 
 class MessagePublisher:
+    """Class to make it easier to publish messages to RabbitMQ"""
+
     def __init__(self, amqp_url: str, app_id: str):
         self._connection = None
         self._channel = None
@@ -77,6 +79,8 @@ class MessagePublisher:
 
 
 class MessageConsumer:
+    """Class to make it easier to consume messages from RabbitMQ"""
+
     def __init__(self, amqp_url, queue, exchange, consumer_method):
         self._connection = None
         self._channel = None
@@ -89,18 +93,9 @@ class MessageConsumer:
 
         self._consume_message = consumer_method
 
-        # In production, experiment with higher prefetch values
-        # for higher consumer throughput
         self._prefetch_count = 1
 
     def connect(self):
-        """This method connects to RabbitMQ, returning the connection handle.
-        When the connection is established, the on_connection_open method
-        will be invoked by pika.
-
-        :rtype: pika.adapters.asyncio_connection.AsyncioConnection
-
-        """
         return AsyncioConnection(
             parameters=pika.URLParameters(self._url),
             on_open_callback=self.on_connection_open,
@@ -165,23 +160,16 @@ class MessageConsumer:
             self._channel.close()
 
     def on_message(self, _unused_channel, basic_deliver, properties, body):
-        """Invoked by pika when a message is delivered from RabbitMQ. The
-        channel is passed for your convenience. The basic_deliver object that
-        is passed in carries the exchange, routing key, delivery tag and
-        a redelivered flag for the message. The properties passed in is an
-        instance of BasicProperties with the message properties and the body
-        is the message that was sent.
+        """
+        Invoked by pika when a message is delivered from RabbitMQ.
+        It calls the _consume_message method that was passed on creation of the MessageConsumer object.
 
-        :param pika.channel.Channel _unused_channel: The channel object
-        :param pika.Spec.Basic.Deliver: basic_deliver method
-        :param pika.Spec.BasicProperties: properties
-        :param bytes body: The message body
-
+        If there is an unhandled error while processing it redelivers the message.
         """
         try:
             self._consume_message(body, basic_deliver, properties)
         except Exception as e:
-            self.re_publish_message(basic_deliver.delivery_tag)
+            self.redeliver_message(basic_deliver.delivery_tag)
             return
 
         self.acknowledge_message(basic_deliver.delivery_tag)
@@ -189,7 +177,7 @@ class MessageConsumer:
     def acknowledge_message(self, delivery_tag):
         self._channel.basic_ack(delivery_tag)
 
-    def re_publish_message(self, delivery_tag):
+    def redeliver_message(self, delivery_tag):
         self._channel.basic_nack(delivery_tag)
 
     def stop_consuming(self):

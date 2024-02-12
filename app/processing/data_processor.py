@@ -38,6 +38,7 @@ class DataProcessor:
         self.logger = logging.getLogger("data_processor")
 
     def message_consumer(self, body, basic_deliver, properties):
+        # This method is called on every message by the MessageConsumer - RabbitMQ consumer client.
         self.process_records_and_store_them_to_database(body)
 
     def process_records_and_store_them_to_database(self, message_body):
@@ -93,7 +94,7 @@ class DataProcessor:
 
     def upsert_batch(self, products):
         """
-        There is no batch upsert method in bunnet ODM, so we use pymongo directly to make upsert more efficient.
+        There is no batch upsert method in Bunnet ODM, so we use pymongo directly to make upsert more efficient.
         This gives us 10x performance improvement over multiple single item upserts using bunnet ODM.
         """
 
@@ -114,7 +115,7 @@ class DataProcessor:
     def update_uploaded_file_records_number_data(
         self, uploaded_file_id, records_processed, records_failed
     ):
-        # Since there are multiple workers updating these values we must do it this way in a single operation.
+        # Since there might be multiple workers updating these values we must do it this way in a single operation.
         UploadedFile.get(uploaded_file_id).inc(
             {
                 UploadedFile.records_processed: records_processed,

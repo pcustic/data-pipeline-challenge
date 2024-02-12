@@ -46,6 +46,7 @@ class FileSplitter:
         self.logger = logging.getLogger("file_splitter")
 
     def message_consumer(self, body, basic_deliver, properties):
+        # This method is called on every message by the MessageConsumer - RabbitMQ consumer client.
         self.split_uploaded_files_and_send_records_to_processing(body)
 
     def split_uploaded_files_and_send_records_to_processing(self, message_body):
@@ -88,6 +89,7 @@ class FileSplitter:
                 f"Error while processing file {uploaded_file_message.id}."
             )
 
+            # Since this is some kind of unexpected error, maybe with DB, blow up loudly.
             raise e
 
         if file_should_be_deleted:

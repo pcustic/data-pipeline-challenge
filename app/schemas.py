@@ -49,4 +49,8 @@ class RecordsBatchForProcessing(BaseModel):
 
 
 class MultipleProducts(BaseModel):
+    """
+    Response containing multiple products.
+    """
+
     products: list[Product]
