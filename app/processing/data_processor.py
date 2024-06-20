@@ -14,7 +14,7 @@ from app.models import Product, UploadedFile, UploadedFileStatus
 
 
 class DataProcessor:
-    EXCHANGE = "veryfi"
+    EXCHANGE = "company"
     CONSUME_QUEUE = "data_processing"
 
     def __init__(self):
@@ -32,7 +32,7 @@ class DataProcessor:
         )
 
         client = MongoClient(settings.MONGODB_CONNECTION_URL)
-        init_bunnet(database=client["veryfi"], document_models=[Product, UploadedFile])
+        init_bunnet(database=client["company"], document_models=[Product, UploadedFile])
         self.product_collection = Product.get_motor_collection()
 
         self.logger = logging.getLogger("data_processor")
@@ -80,7 +80,7 @@ class DataProcessor:
         )
 
     def prepeare_record(self, record, records_batch):
-        # We need to remove the external ids if they exist and add our file_id and last_modified_at_veryfi.
+        # We need to remove the external ids if they exist and add our file_id and last_modified_at_company.
         if "id" in record:
             del record["id"]
 
@@ -88,7 +88,7 @@ class DataProcessor:
             del record["_id"]
 
         record["file_id"] = records_batch.file_id
-        record["last_modified_at_veryfi"] = datetime.now()
+        record["last_modified_at_company"] = datetime.now()
 
         return record
 

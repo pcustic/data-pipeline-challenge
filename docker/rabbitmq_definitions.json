@@ -67,7 +67,7 @@
    ],
    "exchanges":[
       {
-         "name":"veryfi",
+         "name":"company",
          "vhost":"/",
          "type":"direct",
          "durable":true,
@@ -80,7 +80,7 @@
    ],
    "bindings":[
       {
-         "source":"veryfi",
+         "source":"company",
          "vhost":"/",
          "destination":"data_processing",
          "destination_type":"queue",
@@ -90,7 +90,7 @@
          }
       },
       {
-         "source":"veryfi",
+         "source":"company",
          "vhost":"/",
          "destination":"file_uploaded",
          "destination_type":"queue",

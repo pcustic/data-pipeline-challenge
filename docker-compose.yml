@@ -1,7 +1,7 @@
 version: "3"
 
 services:
-  veryfi_api:
+  company_api:
     build:
       context: .
       dockerfile: ./docker/api.Dockerfile
@@ -10,36 +10,36 @@ services:
     volumes:
       - uploaded_files:/data/uploaded_files
     depends_on:
-      veryfi_rabbit:
+      company_rabbit:
         condition: service_healthy
-      veryfi_mongo:
+      company_mongo:
         condition: service_started
 
-  veryfi_file_splitter:
+  company_file_splitter:
     build:
       context: .
       dockerfile: ./docker/file_splitter.Dockerfile
     volumes:
       - uploaded_files:/data/uploaded_files
     depends_on:
-      veryfi_rabbit:
+      company_rabbit:
         condition: service_healthy
-      veryfi_mongo:
+      company_mongo:
         condition: service_started
 
-  veryfi_data_processor:
+  company_data_processor:
     build:
       context: .
       dockerfile: ./docker/data_processor.Dockerfile
     volumes:
       - uploaded_files:/data/uploaded_files
     depends_on:
-      veryfi_rabbit:
+      company_rabbit:
         condition: service_healthy
-      veryfi_mongo:
+      company_mongo:
         condition: service_started
 
-  veryfi_rabbit:
+  company_rabbit:
     build:
       context: .
       dockerfile: ./docker/rabbitmq.Dockerfile
@@ -54,7 +54,7 @@ services:
       - "15672:15672"
       - "5672:5672"
 
-  veryfi_mongo:
+  company_mongo:
     image: mongo
     ports:
       - "27017:27017"

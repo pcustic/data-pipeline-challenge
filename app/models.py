@@ -8,7 +8,7 @@ class Product(Document):
     code: Indexed(str, unique=True)
     product_name: str | None = None
 
-    last_modified_at_veryfi: datetime | None = None
+    last_modified_at_company: datetime | None = None
 
     file_id: str
 
@@ -21,7 +21,7 @@ class Product(Document):
 
     @before_event(Insert, Replace)
     def update_last_modified(self):
-        self.last_modified_at_veryfi = datetime.now()
+        self.last_modified_at_company = datetime.now()
 
 
 class UploadedFileStatus(str, Enum):

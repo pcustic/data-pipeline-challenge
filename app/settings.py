@@ -6,7 +6,7 @@ load_dotenv()
 
 
 MONGODB_CONNECTION_URL = os.getenv(
-    "MONGODB_CONNECTION_URL", "mongodb://localhost:27017/veryfi"
+    "MONGODB_CONNECTION_URL", "mongodb://localhost:27017/company"
 )
 
 RABBITMQ_USER = os.getenv("RABBITMQ_USER", "guest")

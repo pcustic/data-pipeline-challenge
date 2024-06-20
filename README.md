@@ -1,11 +1,11 @@
-# Veryfi Challenge - Data
+# Data Challenge
 
-This is my submission for a Veryfi data interview challenge. 
+This is my submission for a data interview challenge. 
 
 In short, the task was following:
 
-> Suppose that Veryfi is building a database of products that may appear on customer receipt
-scans. There is no official database of products; Veryfi has to build it from various data sources.
+> Suppose that a company is building a database of products that may appear on customer receipt
+scans. There is no official database of products; company has to build it from various data sources.
 > 
 > The dataset includes a sample of 50,000 products in .json format from a website called
 openfoodfacts.com, which crowdsources its information and is publicly available.
@@ -61,7 +61,7 @@ found in the file. That is used later to track if we have processed the whole fi
 
 **DataProcessor** is the service that is listening to the messages on the `data_processing` queue. Those messages
 contain actual items that need to be saved to the database. To each item we add two fields: `file_id` - id of the file
-from which the record is extracted and `last_modified_at_veryfi` - which states datetime of the insertion/update in
+from which the record is extracted and `last_modified_at_company` - which states datetime of the insertion/update in
 our system. We use the `code` key from the item as a key by which we uniquely determine each item. The service upserts
 each record, i.e. updates a record if there is already a record with the same `code`, otherwise inserts it into the DB.
 
@@ -72,7 +72,7 @@ class Product(Document):
     code: Indexed(str, unique=True)   # -> our unique "key"
     product_name: str | None = None   # -> we also create index on this field since it might be useful for find/search.
 
-    last_modified_at_veryfi: datetime | None = None
+    last_modified_at_company: datetime | None = None
     file_id: str
     
     # other fields extracted from items are included here
@@ -136,7 +136,7 @@ To shut down the services you can use the command `docker-compose down`.
 For added flexibility you can run all the services manually:
 
 1. Clone the repo and enter the root dir of the project `cd data-pipeline-challenge`.
-2. Install MongoDB or run it in a docker container. Create database called `veryfi`.
+2. Install MongoDB or run it in a docker container. Create database called `company`.
 3. Install RabbitMQ or run it in a docker container. Load definitions by running 
 `rabbitmqctl import_definitions docker/rabbitmq_definitions.json`.
 4. Install the requirements (you can use the virtualenv here) by running `pip install -r requirements.txt`.

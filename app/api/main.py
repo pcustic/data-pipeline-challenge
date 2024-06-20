@@ -22,7 +22,7 @@ from app.mq import MessagePublisher
 
 async def init_db():
     client = MongoClient(settings.MONGODB_CONNECTION_URL)
-    init_bunnet(database=client["veryfi"], document_models=[Product, UploadedFile])
+    init_bunnet(database=client["company"], document_models=[Product, UploadedFile])
 
 
 async def init_mq():
@@ -32,7 +32,7 @@ async def init_mq():
     port = settings.RABBITMQ_PORT
     amqp_url = f"amqp://{user}:{password}@{host}:{port}/%2F"
 
-    mq = MessagePublisher(amqp_url, app_id="veryfi-api")
+    mq = MessagePublisher(amqp_url, app_id="company-api")
     mq.connect()
 
     return mq
@@ -49,8 +49,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Veryfi Data Pipeline API",
-    description="Data pipeline API for ingesting products data into Veryfi system.",
+    title="Data Pipeline API",
+    description="Data pipeline API for ingesting products data into company system.",
     lifespan=lifespan,
 )
 app.mq: MessagePublisher
@@ -59,7 +59,7 @@ app.mq: MessagePublisher
 @app.post("/upload", response_model=UploadedFileResponse, tags=["Upload"])
 async def upload_dataset_file(file: UploadFile, request: Request):
     """
-    Upload json file with the list of products to ingest into Veryfi database.
+    Upload json file with the list of products to ingest into company database.
     """
 
     current_time = datetime.now()
@@ -92,7 +92,7 @@ async def upload_dataset_file(file: UploadFile, request: Request):
         location=uploaded_file.location,
         uploaded_at=current_time,
     )
-    app.mq.publish_message(message.model_dump_json(), "veryfi", "file_uploaded")
+    app.mq.publish_message(message.model_dump_json(), "company", "file_uploaded")
 
     uploaded_file_id = str(uploaded_file.id)
     return {

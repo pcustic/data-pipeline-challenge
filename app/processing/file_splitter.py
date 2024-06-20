@@ -19,7 +19,7 @@ class FileSplitterException(Exception):
 
 class FileSplitter:
     BATCH_SIZE = 100
-    EXCHANGE = "veryfi"
+    EXCHANGE = "company"
     CONSUME_QUEUE = "file_uploaded"
     PUBLISH_QUEUE = "data_processing"
 
@@ -41,7 +41,7 @@ class FileSplitter:
         self.publisher.connect()
 
         client = MongoClient(settings.MONGODB_CONNECTION_URL)
-        init_bunnet(database=client["veryfi"], document_models=[UploadedFile])
+        init_bunnet(database=client["company"], document_models=[UploadedFile])
 
         self.logger = logging.getLogger("file_splitter")
 
